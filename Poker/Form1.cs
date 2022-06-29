@@ -133,6 +133,74 @@ namespace Poker
                 this.Location = new Point(x, y);
             }
         }
+        public class Combinations
+        {
+            public void FindCombination(List<Card> cards, out Combination combo, out List<Card> comboCards)
+            {
+                combo = Combination.SeniorCard;
+                var sortedCards = cards.OrderBy(x => x.Rank);
+                comboCards = new List<Card>();
+                comboCards.Add(sortedCards.Last());
+                TryToFindCouple(sortedCards, out var couple);
+                if (couple != null)
+                {
+                    comboCards = couple;
+                    combo = Combination.Couple;
+                }
+            }
+            public void TryToFindCouple(IOrderedEnumerable<Card> cards, out List<Card> couple)
+            {
+                couple = null;
+                for (int i = 0; i < cards.Count(); i++)
+                {
+                    for (int j = 0; j < cards.Count(); j++)
+                    {
+                        if ((cards.ElementAt(i).Rank == cards.ElementAt(j).Rank) && (i != j))
+                        {
+                            couple = new List<Card>();
+                            couple.Add(cards.ElementAt(i));
+                            couple.Add(cards.ElementAt(j));
+                            break;
+                        }    
+                    }
+                }
+            }
+            public bool isStreet(IOrderedEnumerable<Card> cards)
+            {
+                var street = true;
+                for (int i = 1; i < cards.Count(); i++)
+                {
+                    if (cards.ElementAt(i).Rank - cards.ElementAt(i - 1).Rank != 1)
+                    {
+                        street = false;
+                        break;
+                    }
+                }
+                return false;
+            }
+            public bool isFlash(IOrderedEnumerable<Card> cards)
+            {
+                var flash = true;
+                Suit suit = cards.ElementAt(0).Suit;
+                for (int i = 1; i < cards.Count(); i++)
+                {
+                    if (cards.ElementAt(i).Suit != suit)
+                    {
+                        flash = false;
+                        break;
+                    }
+                }
+                return flash;
+            }
+            public bool isFlashStreet(IOrderedEnumerable<Card> cards)
+            {
+                return isFlash(cards) && isStreet(cards);
+            }
+            public bool isRoyalStreet(IOrderedEnumerable<Card> cards)
+            {
+                return isFlashStreet(cards) && (cards.Last().Rank == 14);
+            }
+        }
         public class SetOfCards
         {
             public List<Card> cards { get; set; }
@@ -175,6 +243,22 @@ namespace Poker
             this.Visible = false;
             container.ThrowCards();
         }
+       public Dictionary<int,string> ranks = new Dictionary<int, string>()
+       {
+           { 2, "Two" },
+           { 3, "Three" },
+           { 4, "Four" },
+           { 5, "Five" },
+           { 6, "Six" },
+           { 7, "Seven" },
+           { 8, "Eight" },
+           { 9, "Nine" },
+           { 10, "Ten" },
+           { 11, "Jack" },
+           { 12, "Queen" },
+           { 13, "King" },
+           { 14, "ACE" },
+       };
     }
     public enum Suit
     {
@@ -192,5 +276,18 @@ namespace Poker
     {
         Bot,
         Human
+    }
+    public enum Combination
+    {
+        SeniorCard,
+        Couple,
+        Triple,
+        DoubleCouple,
+        Street,
+        Flash,
+        FullHouse,
+        Kare,
+        StreetFlash,
+        RoyalFlash
     }
 }
