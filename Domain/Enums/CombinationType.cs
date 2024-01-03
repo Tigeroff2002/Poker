@@ -3,7 +3,7 @@
 /// <summary>
 /// Комбинация среди карт в рукаве (по умолчанию 5 штук).
 /// </summary>
-public enum Combination : byte
+public enum CombinationType : byte
 {
     /// <summary>
     /// Старшая карта.
